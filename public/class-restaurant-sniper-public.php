@@ -89,6 +89,7 @@ class Restaurant_Sniper_Public {
 
         $body = wp_remote_retrieve_body($response);
         if (preg_match('/var PRELOADED = JSON\.parse\("(.*?)"\);/', $body, $matches)) {
+			error_log("Found XML:" . $matches);
             $json_str = str_replace('\\', '', $matches[1]);
             $data = json_decode($json_str, true);
             
@@ -129,7 +130,7 @@ class Restaurant_Sniper_Public {
 			wp_send_json_success('Monitor added successfully');
 		}
     }
-	
+
 
     public function delete_restaurant_monitor() {
         check_ajax_referer('restaurant_monitor_nonce', 'nonce');

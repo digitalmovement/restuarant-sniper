@@ -67,36 +67,56 @@ class Restaurant_Sniper_Public {
         return ob_get_clean();
     }
 
-    public function add_restaurant_monitor() {
-        check_ajax_referer('restaurant_monitor_nonce', 'nonce');
-        
-        if (!is_user_logged_in()) {
-            wp_send_json_error('User not logged in');
-            return;
-        }
-
-        $url = sanitize_url($_POST['restaurant_url']);
-        $date = sanitize_text_field($_POST['reservation_date']);
-        $time = sanitize_text_field($_POST['reservation_time']);
-        $party_size = intval($_POST['party_size']);
-
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'restaurant_monitors';
-        
-        $result = $wpdb->insert($table_name, array(
-            'user_id' => get_current_user_id(),
-            'restaurant_url' => $url,
-            'reservation_date' => $date,
-            'reservation_time' => $time,
-            'party_size' => $party_size
-        ));
-
-        if ($result) {
-            wp_send_json_success('Monitor added successfully');
-        } else {
-            wp_send_json_error('Failed to add monitor');
-        }
-    }
+	public function add_restaurant_monitor() {
+		check_ajax_referer('restaurant_monitor_nonce', 'nonce');
+		
+		if (!is_user_logged_in()) {
+			wp_send_json_error('User not logged in');
+			return;
+		}
+	
+		// Debug incoming data
+		error_log('Restaurant Monitor - POST data: ' . print_r($_POST, true));
+	
+		$url = sanitize_url($_POST['restaurant_url']);
+		$date = sanitize_text_field($_POST['reservation_date']);
+		$time = sanitize_text_field($_POST['reservation_time']);
+		$party_size = intval($_POST['party_size']);
+	
+		// Debug sanitized data
+		error_log('Restaurant Monitor - Sanitized data:');
+		error_log("URL: $url");
+		error_log("Date: $date");
+		error_log("Time: $time");
+		error_log("Party Size: $party_size");
+		error_log("User ID: " . get_current_user_id());
+	
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'restaurant_monitors';
+		
+		// Debug SQL query
+		$wpdb->show_errors();
+		
+		$data = array(
+			'user_id' => get_current_user_id(),
+			'restaurant_url' => $url,
+			'reservation_date' => $date,
+			'reservation_time' => $time,
+			'party_size' => $party_size
+		);
+	
+		error_log('Restaurant Monitor - Insert data: ' . print_r($data, true));
+		
+		$result = $wpdb->insert($table_name, $data);
+		
+		if ($result === false) {
+			error_log('Restaurant Monitor - DB Error: ' . $wpdb->last_error);
+			wp_send_json_error('Failed to add monitor: ' . $wpdb->last_error);
+		} else {
+			error_log('Restaurant Monitor - Success: Insert ID ' . $wpdb->insert_id);
+			wp_send_json_success('Monitor added successfully');
+		}
+	}
 
     public function delete_restaurant_monitor() {
         check_ajax_referer('restaurant_monitor_nonce', 'nonce');

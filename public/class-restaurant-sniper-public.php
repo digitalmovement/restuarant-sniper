@@ -89,7 +89,7 @@ class Restaurant_Sniper_Public {
 
         $body = wp_remote_retrieve_body($response);
         if (preg_match('/var PRELOADED = JSON\.parse\("(.*?)"\);/', $body, $matches)) {
-			error_log("Found XML:" . $matches);
+			error_log("Found XML:" . print_r($matches));
             $json_str = str_replace('\\', '', $matches[1]);
             $data = json_decode($json_str, true);
             

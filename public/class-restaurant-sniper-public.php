@@ -129,6 +129,7 @@ class Restaurant_Sniper_Public {
 			wp_send_json_success('Monitor added successfully');
 		}
     }
+	
 
     public function delete_restaurant_monitor() {
         check_ajax_referer('restaurant_monitor_nonce', 'nonce');

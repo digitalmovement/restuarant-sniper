@@ -103,22 +103,31 @@ class Restaurant_Sniper_Public {
             return;
         }
 
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'restaurant_monitors';
-        
-        $result = $wpdb->insert($table_name, array(
-            'user_id' => get_current_user_id(),
-            'restaurant_url' => $url,
-            'reservation_date' => $date,
-            'reservation_time' => $time,
-            'party_size' => $party_size
-        ));
-
-        if ($result) {
-            wp_send_json_success('Monitor added successfully');
-        } else {
-            wp_send_json_error('Failed to add monitor');
-        }
+		global $wpdb;
+		$table_name = $wpdb->prefix . 'restaurant_monitors';
+		
+		// Debug SQL query
+		$wpdb->show_errors();
+		
+		$data = array(
+			'user_id' => get_current_user_id(),
+			'restaurant_url' => $url,
+			'reservation_date' => $date,
+			'reservation_time' => $time,
+			'party_size' => $party_size
+		);
+	
+		error_log('Restaurant Monitor - Insert data: ' . print_r($data, true));
+		
+		$result = $wpdb->insert($table_name, $data);
+		
+		if ($result === false) {
+			error_log('Restaurant Monitor - DB Error: ' . $wpdb->last_error);
+			wp_send_json_error('Failed to add monitor: ' . $wpdb->last_error);
+		} else {
+			error_log('Restaurant Monitor - Success: Insert ID ' . $wpdb->insert_id);
+			wp_send_json_success('Monitor added successfully');
+		}
     }
 
     public function delete_restaurant_monitor() {

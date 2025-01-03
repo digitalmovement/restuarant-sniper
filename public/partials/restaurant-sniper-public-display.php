@@ -67,7 +67,7 @@
                 
                 // Build the complete booking URL with parameters
                 $booking_url = sprintf(
-                    'https://www.sevenrooms.com/reservations/%s/search?date=%s&start_time=%s&party_size=%d&venue=%s',
+                    'https://www.sevenrooms.com/explore/%s/reservations/create/search?date=%s&start_time=%s&party_size=%d&venue=%s',
                     $venue,
                     $monitor->reservation_date,
                     urlencode($formatted_time),

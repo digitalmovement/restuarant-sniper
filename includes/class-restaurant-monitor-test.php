@@ -60,7 +60,7 @@ class Restaurant_Monitor_Test {
                     echo "\nDate: $date\n";
                     echo "----------------------------------------\n";
                     foreach ($slots[0] as $slot) {
-                  
+                        print_r($slot); echo "======";
                         if (isset($slot['time'])) {
                             echo sprintf(
                                 "Time: %s - %s - %s\n",

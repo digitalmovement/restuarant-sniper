@@ -109,7 +109,7 @@ class Restaurant_Sniper_Public {
         }
 
         $body = wp_remote_retrieve_body($response);
-		$data = parse_sevenrooms_json ($body);
+		$data = $this->parse_sevenrooms_json ($body);
 
             if (isset($data['base_venue']['url_key'])) {
                 $url = $data['base_venue']['url_key'];

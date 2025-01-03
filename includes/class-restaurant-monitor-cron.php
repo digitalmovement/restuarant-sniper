@@ -56,9 +56,9 @@ class Restaurant_Monitor_Cron {
 
             $body = wp_remote_retrieve_body($response);
 
-            error_log("Body Text: "  . var_export($body));
+          
             $data = json_decode($body, true);
-
+            error_log("Body Text JSON: "  . print_r($data));
             if (self::check_availability_in_data($data)) {
                 self::notify_user($monitor);
                 self::stop_monitoring($monitor->id);

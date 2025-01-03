@@ -51,14 +51,44 @@ jQuery(document).ready(function($) {
     $('.edit-monitor').on('click', function() {
         const $item = $(this).closest('.monitor-item');
         const $details = $item.find('.monitor-details');
+        const currentTime = $details.find('p:nth-child(3)').text().split(': ')[1];
+        const currentPartySize = $details.find('p:nth-child(4)').text().split(': ')[1].split(' ')[0];
+        
+        // Generate time options HTML
+        let timeOptions = '<option value="">Select Time</option>';
+        const start = new Date();
+        start.setHours(11, 0, 0);
+        const end = new Date();
+        end.setHours(23, 30, 0);
+        
+        for (let time = start; time <= end; time.setMinutes(time.getMinutes() + 30)) {
+            const timeValue = time.toLocaleTimeString('en-US', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+            const timeDisplay = time.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit'
+            });
+            const selected = timeDisplay === currentTime ? 'selected' : '';
+            timeOptions += `<option value="${timeValue}" ${selected}>${timeDisplay}</option>`;
+        }
+        
+        // Generate party size options HTML
+        let partySizeOptions = '<option value="">Number of Guests</option>';
+        for (let i = 2; i <= 8; i++) {
+            const selected = i === parseInt(currentPartySize) ? 'selected' : '';
+            partySizeOptions += `<option value="${i}" ${selected}>${i} Guests</option>`;
+        }
         
         // Transform display into editable form
         $details.html(`
             <form class="edit-monitor-form">
                 <input type="url" name="restaurant_url" value="${$details.find('a').attr('href')}" required>
                 <input type="date" name="reservation_date" value="${$details.find('p:nth-child(2)').text().split(': ')[1]}" required>
-                <input type="time" name="reservation_time" value="${$details.find('p:nth-child(3)').text().split(': ')[1]}" required>
-                <input type="number" name="party_size" value="${$details.find('p:nth-child(4)').text().split(': ')[1]}" required>
+                <select name="reservation_time" required>${timeOptions}</select>
+                <select name="party_size" required>${partySizeOptions}</select>
                 <button type="submit">Save</button>
                 <button type="button" class="cancel-edit">Cancel</button>
             </form>

@@ -46,8 +46,6 @@ class Restaurant_Monitor_Cron {
             );
 
             $response = wp_remote_get($url);
-            error_log("URL: ". $url);
-
 
             if (is_wp_error($response)) {
                 error_log('Restaurant Monitor Error: ' . $response->get_error_message());
@@ -55,10 +53,8 @@ class Restaurant_Monitor_Cron {
             }
 
             $body = wp_remote_retrieve_body($response);
-
-          
             $data = json_decode($body, true);
-            error_log("Body Text JSON: "  . print_r($data));
+
             if (self::check_availability_in_data($data)) {
                 self::notify_user($monitor);
                 self::stop_monitoring($monitor->id);

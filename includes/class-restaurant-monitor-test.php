@@ -59,7 +59,7 @@ class Restaurant_Monitor_Test {
                 foreach ($data['data']['availability'] as $date => $slots) {
                     echo "\nDate: $date\n";
                     echo "----------------------------------------\n";
-                    foreach ($slots as $slot) {
+                    foreach ($slots[0] as $slot) {
                   
                         if (isset($slot['time'])) {
                             echo sprintf(

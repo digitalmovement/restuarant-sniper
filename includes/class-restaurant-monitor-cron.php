@@ -46,6 +46,8 @@ class Restaurant_Monitor_Cron {
             );
 
             $response = wp_remote_get($url);
+            error_log("URL: ". $url);
+            error_log($response);
             
             if (is_wp_error($response)) {
                 error_log('Restaurant Monitor Error: ' . $response->get_error_message());

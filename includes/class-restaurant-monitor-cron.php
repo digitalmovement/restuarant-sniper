@@ -55,30 +55,47 @@ class Restaurant_Monitor_Cron {
             $body = wp_remote_retrieve_body($response);
             $data = json_decode($body, true);
 
-            if (self::check_availability_in_data($data)) {
-                self::notify_user($monitor);
+            $availability_check = self::check_availability_in_data(
+                $data, 
+                $monitor->reservation_date . ' ' . $monitor->reservation_time
+            );
+
+            if ($availability_check['available']) {
+                self::notify_user($monitor, $availability_check['found_time'] ?? null);
                 self::stop_monitoring($monitor->id);
             }
         }
     }
 
-    private static function check_availability_in_data($data) {
+    private static function check_availability_in_data($data, $requested_time) {
         if (!isset($data['data']['availability'])) {
             return false;
         }
 
+        $requested_timestamp = strtotime($requested_time);
+        $two_hours_before = $requested_timestamp - 7200; // 2 hours in seconds
+        $two_hours_after = $requested_timestamp + 7200;
+
         foreach ($data['data']['availability'] as $date => $dateData) {
             foreach ($dateData[0]['times'] as $slot) {
-                if (isset($slot['type']) && $slot['type'] === 'request' && $slot['is_requestable']) {
-                    return true;
+                if (isset($slot['time']) && !isset($slot['is_requestable'])) {
+                    $slot_timestamp = strtotime($date . ' ' . $slot['time']);
+                    
+                    // Check if slot is within 2 hours window
+                    if ($slot_timestamp >= $two_hours_before && $slot_timestamp <= $two_hours_after) {
+                        return [
+                            'available' => true,
+                            'found_time' => $slot['time']
+                        ];
+                    }
                 }
             }
         }
         
-        return false;
+        return ['available' => false];
     }
 
-    private static function notify_user($monitor) {
+    private static function notify_user($monitor, $found_time = null) {
         $user = get_userdata($monitor->user_id);
         if (!$user) return;
 
@@ -88,20 +105,29 @@ class Restaurant_Monitor_Cron {
         );
 
         $subject = 'Restaurant Availability Alert!';
+        
+        // Add found time information if available
+        $time_message = $found_time ? 
+            sprintf("Available Time: %s (within 2 hours of your requested time %s)\n", 
+                $found_time, 
+                $monitor->reservation_time) :
+            sprintf("Time: %s\n", $monitor->reservation_time);
+
         $message = sprintf(
             "A table is now available for your requested booking:\n\n" .
             "Date: %s\n" .
-            "Time: %s\n" .
+            "%s" .
             "Party Size: %d\n\n" .
             "Book now at: %s",
             $monitor->reservation_date,
-            $monitor->reservation_time,
+            $time_message,
             $monitor->party_size,
             $booking_url
         );
 
         wp_mail($user->user_email, $subject, $message);
     }
+
 
     private static function stop_monitoring($monitor_id) {
         global $wpdb;

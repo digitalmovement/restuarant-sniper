@@ -121,6 +121,7 @@ class Restaurant_Sniper {
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-restaurant-sniper-public.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-restaurant-monitor-cron.php';
 
 		$this->loader = new Restaurant_Sniper_Loader();
 

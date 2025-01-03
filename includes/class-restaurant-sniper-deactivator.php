@@ -30,7 +30,7 @@ class Restaurant_Sniper_Deactivator {
 	 * @since    1.0.0
 	 */
 	public static function deactivate() {
-
+		wp_clear_scheduled_hook('restaurant_monitor_cron_hook');
 	}
 
 }

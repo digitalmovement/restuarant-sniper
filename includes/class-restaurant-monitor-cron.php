@@ -101,7 +101,11 @@ class Restaurant_Monitor_Cron {
 
         $booking_url = sprintf(
             'https://www.sevenrooms.com/reservations/%s',
-            $monitor->restaurant_url
+            'https://www.sevenrooms.com/explore/%s/reservations/create/search?date=%s&halo=120&party_size=%s&start_time=%s',        
+            $monitor->restaurant_url,
+            $monitor->reservation_date,
+            $monitor->party_size,
+            urlencode(date('g:i A', strtotime($monitor->reservation_time))),
         );
 
         $subject = 'Restaurant Availability Alert!';
@@ -135,7 +139,7 @@ class Restaurant_Monitor_Cron {
         
         $wpdb->update(
             $table_name,
-            ['stop_monitoring' => 1],
+            ['stop_monitoring' => 0],
             ['id' => $monitor_id],
             ['%d'],
             ['%d']

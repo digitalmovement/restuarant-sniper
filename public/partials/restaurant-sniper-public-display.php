@@ -58,9 +58,26 @@
             <p>No restaurants being monitored.</p>
         <?php else : ?>
             <?php foreach ($monitors as $monitor) : ?>
+                <?php
+                // Extract venue from the stored URL
+                $venue = basename(parse_url($monitor->restaurant_url, PHP_URL_PATH));
+                
+                // Format time for URL (24-hour format)
+                $formatted_time = date('H:i', strtotime($monitor->reservation_time));
+                
+                // Build the complete booking URL with parameters
+                $booking_url = sprintf(
+                    'https://www.sevenrooms.com/reservations/%s/search?date=%s&start_time=%s&party_size=%d&venue=%s',
+                    $venue,
+                    $monitor->reservation_date,
+                    urlencode($formatted_time),
+                    $monitor->party_size,
+                    $venue
+                );
+                ?>
                 <div class="monitor-item" data-id="<?php echo esc_attr($monitor->id); ?>">
                     <div class="monitor-details">
-                        <p>Restaurant: <a href="<?php echo esc_url($monitor->restaurant_url); ?>" target="_blank"><?php echo esc_url($monitor->restaurant_url); ?></a></p>
+                        <p>Restaurant: <a href="<?php echo esc_url($booking_url); ?>" target="_blank"><?php echo esc_html($venue); ?></a></p>
                         <p>Date: <?php echo esc_html($monitor->reservation_date); ?></p>
                         <p>Time: <?php echo esc_html(date('g:i A', strtotime($monitor->reservation_time))); ?></p>
                         <p>Party Size: <?php echo esc_html($monitor->party_size); ?> Guests</p>

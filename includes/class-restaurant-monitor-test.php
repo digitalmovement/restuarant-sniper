@@ -57,7 +57,7 @@ class Restaurant_Monitor_Test {
                 echo "\nFound availability data\n";
                 foreach ($data['data']['availability'] as $date) {
                     foreach ($date as $slot) {
-                        print($slot['time']. "\n");
+                        print_r($slot . "\n");
                         if (isset($slot['time'])) {
                             echo sprintf(
                                 "Time: %s - %s - %s\n",

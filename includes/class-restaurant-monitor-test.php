@@ -68,7 +68,7 @@ class Restaurant_Monitor_Test {
                                 "Time: %s - %s - %s\n",
                                 $slot['time'],
                                 isset($slot['type']) ? $slot['type'] : 'N/A',
-                                isset($slot['is_requestable']) ? 'Available' : 'Not Available'
+                                isset($slot['is_requestable']) ? 'Not Available' : 'Available'
                             );
                         }
                     }

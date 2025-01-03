@@ -67,13 +67,14 @@ class Restaurant_Monitor_Cron {
             return false;
         }
 
-        foreach ($data['data']['availability'] as $date) {
-            foreach ($date as $slot) {
+        foreach ($data['data']['availability'] as $date => $dateData) {
+            foreach ($dateData[0]['times'] as $slot) {
                 if (isset($slot['type']) && $slot['type'] === 'request' && $slot['is_requestable']) {
                     return true;
                 }
             }
         }
+        
         return false;
     }
 

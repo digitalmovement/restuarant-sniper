@@ -56,10 +56,12 @@ class Restaurant_Monitor_Test {
 
             if (isset($data['data']['availability'])) {
                 echo "\nFound availability data.\n";
-                foreach ($data['data']['availability'] as $date => $slots) {
+                foreach ($data['data']['availability'] as $date => $dateData) {
                     echo "\nDate: $date\n";
                     echo "----------------------------------------\n";
-                    foreach ($slots[0] as $slot) {
+                    
+                    // Loop through the array of time slots for this date
+                    foreach ($dateData[0]['times'] as $slot) {
                         print_r($slot); echo "======";
                         if (isset($slot['time'])) {
                             echo sprintf(

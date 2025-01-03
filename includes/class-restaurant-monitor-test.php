@@ -51,13 +51,13 @@ class Restaurant_Monitor_Test {
             $data = json_decode($body, true);
             
             echo "\nResponse Status Code: " . wp_remote_retrieve_response_code($response) . "\n";
-            
-            print_r($data);
-            
+    
+
             if (isset($data['data']['availability'])) {
                 echo "\nFound availability data\n";
                 foreach ($data['data']['availability'] as $date) {
                     foreach ($date as $slot) {
+                        print($slot['time']. "\n");
                         if (isset($slot['time'])) {
                             echo sprintf(
                                 "Time: %s - %s - %s\n",

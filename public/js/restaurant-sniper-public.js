@@ -122,6 +122,79 @@ jQuery(document).ready(function($) {
         });
     });
 
+    $('#restaurant_url').on('paste', function(e) {
+        // Wait for the paste to complete
+        setTimeout(() => {
+            const url = $(this).val();
+            try {
+                const urlObj = new URL(url);
+                const searchParams = new URLSearchParams(urlObj.search);
+                
+                // Extract venue from the pathname or venues parameter
+                let venue = urlObj.pathname.split('/')[2];
+                if (!venue && searchParams.has('venues')) {
+                    venue = searchParams.get('venues').split(',')[0];
+                }
+                
+                // Set the cleaned URL
+                const cleanUrl = `https://www.sevenrooms.com/reservations/${venue}`;
+                $(this).val(cleanUrl);
+                
+                // Set date if present
+                if (searchParams.has('date')) {
+                    $('#reservation_date').val(searchParams.get('date'));
+                }
+                
+                // Set time if present
+                if (searchParams.has('start_time')) {
+                    let time = searchParams.get('start_time');
+                    // Convert URL encoded time (e.g., "19%3A00" to "19:00")
+                    time = decodeURIComponent(time);
+                    
+                    // Find and select the closest available time slot
+                    const timeSelect = $('#reservation_time');
+                    const timeOptions = timeSelect.find('option').toArray();
+                    
+                    // Convert time to comparable format (HH:mm)
+                    const requestedTime = time.padStart(5, '0');
+                    
+                    // Find closest match
+                    let closestOption = timeOptions[0];
+                    let smallestDiff = Infinity;
+                    
+                    timeOptions.forEach(option => {
+                        if (option.value) {  // Skip empty/placeholder option
+                            const diff = Math.abs(timeToMinutes(option.value) - timeToMinutes(requestedTime));
+                            if (diff < smallestDiff) {
+                                smallestDiff = diff;
+                                closestOption = option;
+                            }
+                        }
+                    });
+                    
+                    timeSelect.val(closestOption.value);
+                }
+                
+                // Set default party size if not already set
+                if (!$('#party_size').val()) {
+                    $('#party_size').val('2');
+                }
+                
+            } catch (error) {
+                console.error('Error parsing URL:', error);
+            }
+        }, 0);
+    });
+    
+        // Helper function to convert time to minutes for comparison
+        function timeToMinutes(time) {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        
+
+
     $(document).on('click', '.cancel-edit', function() {
         location.reload();
     });

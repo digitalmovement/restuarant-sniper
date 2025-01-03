@@ -67,7 +67,7 @@ class Restaurant_Monitor_Cron {
         }
     }
 
-    private static function check_availability_in_data($data, $requested_time) {
+    public static function check_availability_in_data($data, $requested_time) {
         if (!isset($data['data']['availability'])) {
             return false;
         }

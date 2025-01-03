@@ -67,6 +67,27 @@ class Restaurant_Sniper_Public {
         return ob_get_clean();
     }
 
+	private function parse_sevenrooms_json($html_content) {
+		if (preg_match('/var PRELOADED = JSON\.parse\("(.*?)"\);/', $html_content, $matches)) {
+			$json_str = $matches[1];
+			
+			// Handle Unicode escapes
+			$json_str = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($matches) {
+				return mb_convert_encoding(pack('H*', $matches[1]), 'UTF-8', 'UCS-2BE');
+			}, $json_str);
+			
+			$json_str = preg_replace('/"venue_languages_json":"\[.*?\]"/', '"venue_languages_json":""', $json_str);
+			
+			// Handle other escaped characters
+			$json_str = stripslashes($json_str);
+			
+			
+			return json_decode($json_str, true);
+		}
+		return null;
+	}
+	
+
     public function add_restaurant_monitor() {
         check_ajax_referer('restaurant_monitor_nonce', 'nonce');
         
@@ -88,22 +109,15 @@ class Restaurant_Sniper_Public {
         }
 
         $body = wp_remote_retrieve_body($response);
-        if (preg_match('/var PRELOADED = JSON\.parse\("(.*?)"\);/', $body, $matches)) {
-			error_log("Found XML:" . print_r($matches[1]));
-            $json_str = str_replace('\\', '', $matches[1]);
-            $data = json_decode($json_str, true);
-            
+		$data = parse_sevenrooms_json ($body);
+
             if (isset($data['base_venue']['url_key'])) {
                 $url = $data['base_venue']['url_key'];
             } else {
                 wp_send_json_error('Restaurant URL key not found');
                 return;
             }
-        } else {
-            wp_send_json_error('Failed to parse restaurant data');
-            return;
-        }
-
+       
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'restaurant_monitors';
 		

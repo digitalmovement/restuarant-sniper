@@ -55,7 +55,7 @@ class Restaurant_Monitor_Test {
 
             if (isset($data['data']['availability'])) {
                 echo "\nFound availability data.\n";
-                foreach ($data['data']['availability'] as $booking_date) {
+                foreach ($data['data']['availability']['times'] as $booking_date) {
                     foreach ($booking_date as $slot) {
                         print_r($slot);
                         echo "---------------------------------------------------------------\n";
